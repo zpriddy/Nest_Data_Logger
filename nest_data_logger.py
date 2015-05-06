@@ -32,6 +32,8 @@ programName="INSERT PROGRAM NAME"
 programDescription="INSERT PROGRAM DESCRIPTION"
 
 
+degub = False
+
 
 ##################################################
 #FUNCTIONS
@@ -45,6 +47,7 @@ def getArgs():
 	parser.add_argument("-u","--username",help="Nest Account Username",required=False)
 	parser.add_argument("-p","--password",help="Nest Account Password",required=False)
 	parser.add_argument("-f","--accountfile",help="Nest Account Ifno Saved In File",required=False)
+	parser.add_argument("-d","--debug",help="Debug Mode - Disable Auto Polling",required=False,action="store_true")
 
 
 	return parser.parse_args()
@@ -75,7 +78,9 @@ def nestAuth(user):
 	return myNest
 
 def dataLoop(nest):
-	threading.Timer(180,dataLoop,args=[nest]).start()
+	global debug
+	if(not debug):
+		threading.Timer(180,dataLoop,args=[nest]).start()
 	print "Running Data Loop..."
 
 	dayLog = []
@@ -228,6 +233,9 @@ def generateGraph(dayLog):
 # MAIN
 #############
 def main(args):
+	global debug
+	if(args.debug):
+		debug = True
 	nestUser = User(username=args.username,password=args.password,filename=args.accountfile)
 	myNest = nestAuth(nestUser)
 
