@@ -21,6 +21,8 @@ import utils
 import pickle
 from datetime import * 
 import dateutil.parser
+import threading
+import pygal
 
 
 #########
@@ -73,6 +75,9 @@ def nestAuth(user):
 	return myNest
 
 def dataLoop(nest):
+	threading.Timer(180,dataLoop,args=[nest]).start()
+	print "Running Data Loop..."
+
 	dayLog = []
 	log_filename = 'logs/' + str(datetime.now().year) + '-' + str(datetime.now().month) + '-' + str(datetime.now().day) + '.log'
 	try:
@@ -109,6 +114,8 @@ def dataLoop(nest):
 
 	for x in range(0,len(dayLog)):
 		print dayLog[x]
+
+	generateGraph(dayLog)
 
 	#print dayLog
 
@@ -180,6 +187,39 @@ def calcTotals(log, dayLog):
 
 
 
+def generateGraph(dayLog):
+
+	timestamps = []
+	total_run_time = []
+	total_run_time_home = []
+	total_run_time_away = []
+	total_trans_time = []
+	target_temperature = []
+	current_temperature = []
+	outside_temperature = []
+
+	for log in dayLog:
+		timestamps.append(log['$timestamp'])
+		total_run_time.append(log['total_run_time'])
+		total_run_time_home.append(log['total_run_time_home'])
+		total_run_time_away.append(log['total_run_time_away'])
+		total_trans_time.append(log['total_trans_time'])
+		target_temperature.append(log['target_temperature'])
+		current_temperature.append(log['current_temperature'])
+		outside_temperature.append(log['outside_temperature'])
+
+	line_chart = pygal.Line(interpolate='lagrange')
+	line_chart.title = 'Daily Nest Usage'
+	line_chart.x_labels = timestamps
+	line_chart.add('Total Run Time', total_run_time)
+	line_chart.add('Home Run Time', total_run_time_home)
+	line_chart.add('Away Run Time', total_run_time_away)
+	line_chart.add('Trans Run Time', total_trans_time)
+	line_chart.add('Target Temperature', target_temperature)
+	line_chart.add('Inside Temperature', current_temperature)
+	line_chart.add('Outside Temperature', outside_temperature)
+
+	line_chart.render_to_file('daily.svg')   
 
 
 
@@ -190,6 +230,7 @@ def calcTotals(log, dayLog):
 def main(args):
 	nestUser = User(username=args.username,password=args.password,filename=args.accountfile)
 	myNest = nestAuth(nestUser)
+
 
 	dataLoop(myNest)
 
