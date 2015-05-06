@@ -128,7 +128,7 @@ def dataLoop(nest):
 def deviceData(data,log):
 	global away_temp
 	deviceData = data._device
-	away_temp = deviceData['away_temperature_high']
+	away_temp = utils.c_to_f(deviceData['away_temperature_high'])
 	#log['$timestamp'] = datetime.fromtimestamp(deviceData['$timestamp']/1000).isoformat()
 	
 
@@ -178,6 +178,7 @@ def calcTotals(log, dayLog):
 			log['total_run_time'] = dayLog[index]['total_run_time'] + diff
 
 			if(log['away']):
+				print "CURRENTLY AWAY"
 				log['total_run_time_away'] = dayLog[index]['total_run_time_away'] + diff
 				log['total_run_time_home'] = dayLog[index]['total_run_time_home']
 				log['target_temperature'] = away_temp
@@ -194,6 +195,10 @@ def calcTotals(log, dayLog):
 			else:
 				log['trans_time'] = False
 				log['total_trans_time'] = dayLog[index]['total_trans_time']
+
+		if(log['away']):
+			print "CURRENTLY AWAY"
+			log['target_temperature'] = away_temp
 
 
 
