@@ -32,7 +32,8 @@ programName="INSERT PROGRAM NAME"
 programDescription="INSERT PROGRAM DESCRIPTION"
 
 
-degub = False
+debug = False
+away_temp = 0
 
 
 ##################################################
@@ -125,7 +126,9 @@ def dataLoop(nest):
 	#print dayLog
 
 def deviceData(data,log):
+	global away_temp
 	deviceData = data._device
+	away_temp = deviceData['away_temperature_high']
 	#log['$timestamp'] = datetime.fromtimestamp(deviceData['$timestamp']/1000).isoformat()
 	
 
@@ -146,6 +149,7 @@ def structureData(structure,log):
 	log['away'] = structureData['away']
 
 def calcTotals(log, dayLog):
+	global away_temp
 	dayLogLen = len(dayLog)
 	if(dayLogLen == 0):
 		log['total_run_time'] = 0
@@ -176,6 +180,7 @@ def calcTotals(log, dayLog):
 			if(log['away']):
 				log['total_run_time_away'] = dayLog[index]['total_run_time_away'] + diff
 				log['total_run_time_home'] = dayLog[index]['total_run_time_home']
+				log['target_temperature'] = away_temp
 			elif(not log['away']):
 				log['total_run_time_home'] = dayLog[index]['total_run_time_home'] + diff
 				log['total_run_time_away'] = dayLog[index]['total_run_time_away']
