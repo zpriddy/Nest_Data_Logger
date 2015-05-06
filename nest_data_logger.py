@@ -126,7 +126,7 @@ def dataLoop(nest):
 
 def deviceData(data,log):
 	deviceData = data._device
-	log['$timestamp'] = datetime.fromtimestamp(deviceData['$timestamp']/1000).isoformat()
+	#log['$timestamp'] = datetime.fromtimestamp(deviceData['$timestamp']/1000).isoformat()
 	
 
 def sharedData(data,log):
@@ -142,6 +142,7 @@ def weatherData(data,log):
 
 def structureData(structure,log):
 	structureData = structure._structure
+	log['$timestamp'] = datetime.fromtimestamp(structureData['$timestamp']/1000).isoformat()
 	log['away'] = structureData['away']
 
 def calcTotals(log, dayLog):
