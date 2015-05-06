@@ -208,7 +208,7 @@ def generateGraph(dayLog):
 		current_temperature.append(log['current_temperature'])
 		outside_temperature.append(log['outside_temperature'])
 
-	line_chart = pygal.Line(interpolate='hermite')
+	line_chart = pygal.Line()
 	line_chart.title = 'Daily Nest Usage'
 	line_chart.x_labels = timestamps
 	line_chart.add('Total Run Time', total_run_time)
