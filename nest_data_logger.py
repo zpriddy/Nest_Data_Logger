@@ -34,6 +34,7 @@ programDescription="INSERT PROGRAM DESCRIPTION"
 
 debug = False
 away_temp = 0
+second_timestamp = ''
 
 
 ##################################################
@@ -80,8 +81,9 @@ def nestAuth(user):
 
 def dataLoop(nest):
 	global debug
+	global second_timestamp
 	if(not debug):
-		threading.Timer(180,dataLoop,args=[nest]).start()
+		threading.Timer(120,dataLoop,args=[nest]).start()
 	print "Running Data Loop..."
 
 	dayLog = []
@@ -103,13 +105,21 @@ def dataLoop(nest):
 
 	structureData(structure,log)
 
+	log['$timestamp'] = datetime.now().isoformat()
+
 	calcTotals(log,dayLog)
 
+	
+
 	if(dayLogIndex != 0):
-		if(log['$timestamp'] != dayLog[dayLogIndex-1]['$timestamp']):
-			dayLog.append(log)
-		else:
-			print "No chnage in timestamp recieved.. No new data logged."
+		#if(log['$timestamp'] != dayLog[dayLogIndex-1]['$timestamp']):
+		dayLog.append(log)
+		#else:
+		#	log['$timestamp'] = second_timestamp
+		#	if(log['$timestamp'] != dayLog[dayLogIndex-1]['$timestamp']):
+		#		dayLog.append(log)
+		#	else:
+		#		print "No chnage in timestamp recieved.. No new data logged."
 	else:
 		dayLog.append(log)
 
@@ -129,7 +139,7 @@ def deviceData(data,log):
 	global away_temp
 	deviceData = data._device
 	away_temp = utils.c_to_f(deviceData['away_temperature_high'])
-	#log['$timestamp'] = datetime.fromtimestamp(deviceData['$timestamp']/1000).isoformat()
+	log['$timestamp'] = datetime.fromtimestamp(deviceData['$timestamp']/1000).isoformat()
 	
 
 def sharedData(data,log):
@@ -144,8 +154,9 @@ def weatherData(data,log):
 	log['outside_temperature'] = weatherData['temp_f']
 
 def structureData(structure,log):
+	global second_timestamp
 	structureData = structure._structure
-	log['$timestamp'] = datetime.fromtimestamp(structureData['$timestamp']/1000).isoformat()
+	second_timestamp = datetime.fromtimestamp(structureData['$timestamp']/1000).isoformat()
 	log['away'] = structureData['away']
 
 def calcTotals(log, dayLog):
@@ -172,9 +183,10 @@ def calcTotals(log, dayLog):
 			log['trans_time'] = False
 			log['total_trans_time'] = dayLog[index]['total_trans_time']
 		else:
-			lastTime = dateutil.parser.parse(dayLog[index]['$timestamp'])
-			currentTime = dateutil.parser.parse(log['$timestamp'])
-			diff = float((currentTime - lastTime).seconds)/60
+			then = dateutil.parser.parse(dayLog[index]['$timestamp'])
+			now = dateutil.parser.parse(log['$timestamp'])
+			diff = now - then
+			diff = diff.total_seconds()/60
 			log['total_run_time'] = dayLog[index]['total_run_time'] + diff
 
 			if(log['away']):
@@ -224,7 +236,7 @@ def generateGraph(dayLog):
 		current_temperature.append(log['current_temperature'])
 		outside_temperature.append(log['outside_temperature'])
 
-	line_chart = pygal.Line()
+	line_chart = pygal.Line(x_label_rotation=20,x_labels_major_every=10,show_minor_x_labels=False,dots_size=1)
 	line_chart.title = 'Daily Nest Usage'
 	line_chart.x_labels = timestamps
 	line_chart.add('Total Run Time', total_run_time)
