@@ -23,6 +23,11 @@ from datetime import *
 import dateutil.parser
 import threading
 import pygal
+from bokeh.plotting import *
+import numpy as np
+import pandas as pd
+from bokeh.charts import TimeSeries, show, output_file
+from collections import OrderedDict
 
 
 #########
@@ -138,6 +143,7 @@ def dataLoop(nest):
 def deviceData(data,log):
 	global away_temp
 	deviceData = data._device
+	log['leaf_temp'] = utils.c_to_f(deviceData['leaf_threshold_cool'])
 	away_temp = utils.c_to_f(deviceData['away_temperature_high'])
 	log['$timestamp'] = datetime.fromtimestamp(deviceData['$timestamp']/1000).isoformat()
 	
@@ -176,12 +182,12 @@ def calcTotals(log, dayLog):
 			log['total_run_time_away'] = dayLog[index]['total_run_time_away']
 			log['trans_time'] = False
 			log['total_trans_time'] = dayLog[index]['total_trans_time']
-		elif(log['ac_state'] == True and dayLog[index]['ac_state'] == False):
-			log['total_run_time'] = dayLog[index]['total_run_time']
-			log['total_run_time_home'] = dayLog[index]['total_run_time_home']
-			log['total_run_time_away'] = dayLog[index]['total_run_time_away']
-			log['trans_time'] = False
-			log['total_trans_time'] = dayLog[index]['total_trans_time']
+		#elif(log['ac_state'] == True and dayLog[index]['ac_state'] == False):
+			#log['total_run_time'] = dayLog[index]['total_run_time']
+			#log['total_run_time_home'] = dayLog[index]['total_run_time_home']
+			#log['total_run_time_away'] = dayLog[index]['total_run_time_away']
+			#log['trans_time'] = False
+			#log['total_trans_time'] = dayLog[index]['total_trans_time']
 		else:
 			then = dateutil.parser.parse(dayLog[index]['$timestamp'])
 			now = dateutil.parser.parse(log['$timestamp'])
@@ -236,7 +242,7 @@ def generateGraph(dayLog):
 		current_temperature.append(log['current_temperature'])
 		outside_temperature.append(log['outside_temperature'])
 
-	line_chart = pygal.Line(x_label_rotation=20,x_labels_major_every=10,show_minor_x_labels=False,dots_size=1)
+	line_chart = pygal.Line(x_label_rotation=20,x_labels_major_every=30,show_minor_x_labels=False,dots_size=.2,width=1200,tooltip_border_radius=2)
 	line_chart.title = 'Daily Nest Usage'
 	line_chart.x_labels = timestamps
 	line_chart.add('Total Run Time', total_run_time)
@@ -247,8 +253,43 @@ def generateGraph(dayLog):
 	line_chart.add('Inside Temperature', current_temperature)
 	line_chart.add('Outside Temperature', outside_temperature)
 
-	line_chart.render_to_file('daily.svg')   
+	line_chart.render_to_file('daily.svg')  
 
+
+	output_file("bokeh.html", title="Nest Graph")
+	dates =  np.array(timestamps,dtype='datetime64')
+	inside_temp = np.array(current_temperature)
+	target_temp = np.array(target_temperature)
+	outside_temp = np.array(outside_temperature)
+	p = figure(width=800, height=350, x_axis_type="datetime")
+	p = figure(title="Nest Graph", x_axis_label='Date', y_axis_label='Inside Temp')
+	p.line(dates, inside_temp, legend="Temp.", line_width=2)
+	#p.circle(dates, inside_temp, legend="y=x", fill_color="white", size=8)
+	p.line(dates, outside_temp, legend="Outside.", line_width=2,line_color="orange", line_dash="4 4")
+	p.line(dates, target_temp, legend="Target.", line_width=2,line_color="red", line_dash="2 2")
+	#show(p)
+
+	#TOOLS="resize,pan,wheel_zoom,box_zoom,reset,previewsave"
+	#timestamps = []
+	#for log in dayLog:
+	#	print log['$timestamp']
+
+	#xyvalues = OrderedDict(
+	#	INSIDE=inside_temp,
+	#	OUTSIDE=outside_temp,
+	#	TARGET=target_temp,
+	#	DATE=dates
+	#	)
+	#ts = TimeSeries(
+    #xyvalues, index='DATE', legend=True,
+    #title="Temperature", tools=TOOLS, ylabel='Degrees F',palette=['red','blue','purple'])
+	#ts2 = TimeSeries(
+	#xyvalues, index='DATE', legend=True,
+	#title="Temperature", tools=TOOLS, ylabel='Degrees F',palette=['red','blue','purple'])
+
+	#p = gridchart([ts,ts2])
+
+	#show(p)
 
 
 
@@ -293,3 +334,5 @@ class User:
 if __name__ == '__main__':
 	args = getArgs()
 	main(args)
+
+
