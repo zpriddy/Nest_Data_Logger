@@ -45,9 +45,12 @@ Features in Progress:
  * Ability to render graphs for any day that data was collected
  * **Maybe** Using mongodb to store data
 
+## Sample Graph
+![alt text](https://raw.githubusercontent.com/zpriddy/Nest_Data_Logger/master/sample_logs/sample_graph.png "Sample Graph")
 
 
 ## Notes
 When used without the debug option, the code will poll the nest every two minutes. It uses threading to keep looping the code until you hit ctrl+c. I would suggest running this using screen. 
 The debug option will only run once. 
+
 
