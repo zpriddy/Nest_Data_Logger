@@ -6,8 +6,9 @@
 # me@zpriddy.com 								#
 #												#
 # Features: 									#
-#	- XXXXXX									#
-#	- XXXXXX 									#
+#	- Data logging with daily data saved to a 	#
+#		pickle file								#
+#	- Daily Graph generated using pygal 		#
 #################################################
 #################################################
 
@@ -23,18 +24,18 @@ from datetime import *
 import dateutil.parser
 import threading
 import pygal
-from bokeh.plotting import *
-import numpy as np
-import pandas as pd
-from bokeh.charts import TimeSeries, show, output_file
-from collections import OrderedDict
+#from bokeh.plotting import *
+#import numpy as np
+#import pandas as pd
+#from bokeh.charts import TimeSeries, show, output_file
+#from collections import OrderedDict
 
 
 #########
 #VARS
 #########
-programName="INSERT PROGRAM NAME"
-programDescription="INSERT PROGRAM DESCRIPTION"
+programName="nest_data_logger.py"
+programDescription="This program calls the nest API to record data every two minutes to render a daily graph"
 
 
 debug = False
@@ -51,10 +52,10 @@ second_timestamp = ''
 ##########
 def getArgs():
 	parser = argparse.ArgumentParser(prog=programName, description=programDescription)
-	parser.add_argument("-u","--username",help="Nest Account Username",required=False)
-	parser.add_argument("-p","--password",help="Nest Account Password",required=False)
-	parser.add_argument("-f","--accountfile",help="Nest Account Ifno Saved In File",required=False)
-	parser.add_argument("-d","--debug",help="Debug Mode - Disable Auto Polling",required=False,action="store_true")
+	parser.add_argument("-u","--username",help="Nest Account Username",required=True)
+	parser.add_argument("-p","--password",help="Nest Account Password",required=True)
+	#parser.add_argument("-f","--accountfile",help="Nest Account Ifno Saved In File",required=False) #To Add In Later
+	parser.add_argument("-d","--debug",help="Debug Mode - One Time Run and Debug Info",required=False,action="store_true")
 
 
 	return parser.parse_args()
@@ -257,17 +258,17 @@ def generateGraph(dayLog):
 	line_chart.render_to_file('daily.svg')  
 
 
-	output_file("bokeh.html", title="Nest Graph")
-	dates =  np.array(timestamps,dtype='datetime64')
-	inside_temp = np.array(current_temperature)
-	target_temp = np.array(target_temperature)
-	outside_temp = np.array(outside_temperature)
-	p = figure(width=800, height=350, x_axis_type="datetime")
-	p = figure(title="Nest Graph", x_axis_label='Date', y_axis_label='Inside Temp')
-	p.line(dates, inside_temp, legend="Temp.", line_width=2)
+	#output_file("bokeh.html", title="Nest Graph")
+	#dates =  np.array(timestamps,dtype='datetime64')
+	#inside_temp = np.array(current_temperature)
+	#target_temp = np.array(target_temperature)
+	#outside_temp = np.array(outside_temperature)
+	#p = figure(width=800, height=350, x_axis_type="datetime")
+	#p = figure(title="Nest Graph", x_axis_label='Date', y_axis_label='Inside Temp')
+	#p.line(dates, inside_temp, legend="Temp.", line_width=2)
 	#p.circle(dates, inside_temp, legend="y=x", fill_color="white", size=8)
-	p.line(dates, outside_temp, legend="Outside.", line_width=2,line_color="orange", line_dash="4 4")
-	p.line(dates, target_temp, legend="Target.", line_width=2,line_color="red", line_dash="2 2")
+	#p.line(dates, outside_temp, legend="Outside.", line_width=2,line_color="orange", line_dash="4 4")
+	#p.line(dates, target_temp, legend="Target.", line_width=2,line_color="red", line_dash="2 2")
 	#show(p)
 
 	#TOOLS="resize,pan,wheel_zoom,box_zoom,reset,previewsave"
