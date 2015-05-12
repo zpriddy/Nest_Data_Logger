@@ -151,6 +151,7 @@ def deviceData(data,log):
 def sharedData(data,log):
 	sharedData = data._shared
 	log['target_type'] = sharedData['target_temperature_type']
+	log['fan_state'] = sharedData['hvac_fan_state']
 	log['target_temperature'] = utils.c_to_f(sharedData['target_temperature'])
 	log['current_temperature'] = utils.c_to_f(sharedData['current_temperature'])
 	log['ac_state'] = sharedData['hvac_ac_state']
