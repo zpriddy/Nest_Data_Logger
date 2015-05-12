@@ -302,7 +302,7 @@ def main(args):
 	global debug
 	if(args.debug):
 		debug = True
-	nestUser = User(username=args.username,password=args.password,filename=args.accountfile)
+	nestUser = User(username=args.username,password=args.password) #,filename=args.accountfile)
 	myNest = nestAuth(nestUser)
 
 
