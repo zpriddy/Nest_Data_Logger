@@ -20,6 +20,32 @@ optional arguments:
                         Nest Account Password
   -d, --debug           Debug Mode - One Time Run and Debug Info
 ````
+## Info
+Data Logged and Graphed:
+ * Inside Temperature
+ * Target Temperature
+ * Outside Temperature
+ * Total Run Time of the AC
+  * Total Run Time in Home Mode
+  * Total Run Time in Away Mode
+  * Total Run Time to Transition from Away To Home ( in the hopes of seeing how adjusting the away temperature would effect the total run time of the day..)
+
+Data Logged But Not Graphed:
+ * AC Fan State
+ * Away Status
+ * Nest Leaf Temparature
+  
+Current Features:
+ * Graphing of Current Day Usage
+ * Polls Nest for new data every 2 minutes
+ * Uses pickle to store log files of daily data. (one file per day – Not deleted)
+
+Features in Progress:
+ * Simple python web framework (cherryPy?)
+ * Ability to render graphs for any day that data was collected
+ * **Maybe** Using mongodb to store data
+
+
 
 ## Notes
 When used without the debug option, the code will poll the nest every two minutes. It uses threading to keep looping the code until you hit ctrl+c. I would suggest running this using screen. 
