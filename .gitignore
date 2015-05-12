@@ -1,4 +1,4 @@
 *.pyc
 bokeh.html
-logs/*
+logs/*.log
 *.svg
